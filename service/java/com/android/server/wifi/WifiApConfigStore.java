@@ -24,6 +24,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Messenger;
 import android.text.TextUtils;
+import android.os.SystemProperties;
 import android.util.Log;
 
 import com.android.internal.util.AsyncChannel;
@@ -240,7 +241,8 @@ class WifiApConfigStore extends StateMachine {
        will keep the device secure after the update */
     private void setDefaultApConfiguration() {
         WifiConfiguration config = new WifiConfiguration();
-        config.SSID = mContext.getString(R.string.wifi_tether_configure_ssid_default);
+        //config.SSID = mContext.getString(R.string.wifi_tether_configure_ssid_default);
+        config.SSID = SystemProperties.get("persist.setting.wifi.apname", mContext.getString(R.string.wifi_tether_configure_ssid_default));
         int wifiApSecurityType = mContext.getResources().getInteger(
                 R.integer.wifi_hotspot_security_type);
         config.allowedKeyManagement.set(wifiApSecurityType);
@@ -249,7 +251,8 @@ class WifiApConfigStore extends StateMachine {
         if (TextUtils.isEmpty(config.preSharedKey)) {
             String randomUUID = UUID.randomUUID().toString();
             //first 12 chars from xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
-            config.preSharedKey = randomUUID.substring(0, 8) + randomUUID.substring(9,13);
+            //config.preSharedKey = randomUUID.substring(0, 8) + randomUUID.substring(9,13);
+            config.preSharedKey = SystemProperties.get("persist.setting.wifi.appassword", randomUUID.substring(0, 8) + randomUUID.substring(9,13));
         }
         sendMessage(WifiStateMachine.CMD_SET_AP_CONFIG, config);
     }
